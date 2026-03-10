@@ -1,0 +1,12 @@
+# Normalizar line endings no repositorio para LF
+* text=auto
+
+# Scripts Windows — manter CRLF no checkout Windows
+*.ps1 text eol=crlf
+
+# Scripts Unix — sempre LF
+*.sh text eol=lf
+
+# Markdown e HTML — LF
+*.md text eol=lf
+*.html text eol=lf

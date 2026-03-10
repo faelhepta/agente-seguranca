@@ -1,0 +1,29 @@
+# Projetos analisados (dados de clientes - nunca commitar)
+projetos/
+
+# Relatorios e apresentacoes gerados (gerados localmente por analista)
+relatorios/
+apresentacoes/
+reanalise/
+
+# Arquivos de sistema Windows
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Arquivos de sistema macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Arquivos temporarios do PowerShell
+*.tmp
