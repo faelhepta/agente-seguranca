@@ -67,14 +67,25 @@ Ver detalhes em [GUIA_INSTALACAO.md](GUIA_INSTALACAO.md).
 
 ## Uso
 
+### Modo simples (recomendado)
+
 ```powershell
-# Analise completa (fases 1 a 5 + apresentacoes)
 cd "$env:USERPROFILE\Documents\Seguranca-TI"
+.\analisar.ps1
+```
+
+O script pede o caminho da pasta do projeto, detecta quais artefatos estao presentes (codigo, documentacao, infraestrutura) e executa todas as fases automaticamente.
+
+### Modo avancado (por parametros)
+
+```powershell
+cd "$env:USERPROFILE\Documents\Seguranca-TI"
+
+# Analise completa
 .\rodar_analise.ps1 -Projeto "NomeDoProjeto"
 
 # Fase especifica
 .\rodar_analise.ps1 -Projeto "NomeDoProjeto" -Fase codigo
-.\rodar_analise.ps1 -Projeto "NomeDoProjeto" -Fase infra
 
 # Simular sem executar
 .\rodar_analise.ps1 -Projeto "NomeDoProjeto" -DryRun
@@ -98,15 +109,16 @@ Fases disponiveis: `codigo` | `docs` | `infra` | `threat` | `relatorio` | `apres
 |   |-- relatorio-fabrica.md  <- skill /relatorio-fabrica (apresentacoes HTML)
 |   `-- reanalise-fabrica.md  <- skill /reanalise-fabrica (verificacao de correcoes)
 |-- docs/                     <- instalados em ~/Documents/Seguranca-TI/
+|   |-- analisar.ps1          <- SCRIPT PRINCIPAL: pede o caminho e roda tudo (Windows)
+|   |-- analisar.sh           <- SCRIPT PRINCIPAL: pede o caminho e roda tudo (Linux/WSL)
+|   |-- rodar_analise.ps1     <- script avancado com parametros (Windows)
+|   |-- rodar_analise.sh      <- script avancado com parametros (Linux/WSL)
 |   |-- RUNBOOK_AGENTE_SEGURANCA.md
 |   |-- CHECKLIST_SEGURANCA_PROJETOS.md
 |   |-- CHECKLIST_REANALISE_PROJETOS.md
 |   |-- TUTORIAL_RODAR_ANALISE.md
-|   |-- apresentacao_time_seguranca.html
-|   |-- rodar_analise.ps1     <- script de automacao (Windows)
-|   `-- rodar_analise.sh      <- script de automacao (Linux/WSL)
+|   `-- apresentacao_time_seguranca.html
 `-- extras/
-    |-- analisar.ps1          <- analise interativa (solicita o caminho do projeto)
     |-- gerar_apresentacoes.ps1 <- regenera as apresentacoes HTML de um projeto ja analisado
     `-- analisar_api.ps1
 ```
