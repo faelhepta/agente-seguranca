@@ -8,8 +8,8 @@
     na maquina do analista. Requer Claude Code ja instalado.
 
 .PARAMETER Modo
-    install  (padrao) — instalacao completa
-    update   — atualiza apenas skills e documentos, sem recriar pastas
+    install  (padrao) -instalacao completa
+    update   -atualiza apenas skills e documentos, sem recriar pastas
 
 .PARAMETER OrigemDocs
     Caminho para a pasta do pacote. Padrao: pasta onde o script esta localizado.
@@ -26,9 +26,9 @@ param(
     [string]$OrigemDocs = $PSScriptRoot
 )
 
-# ─────────────────────────────────────────────
+# ---------------------------------------------
 #  CONFIGURACAO
-# ─────────────────────────────────────────────
+# ---------------------------------------------
 $VERSAO_PACOTE    = "1.0"
 $NODE_VERSAO_MIN  = 18
 $DESTINO_SKILLS   = "$env:USERPROFILE\.claude\skills"
@@ -37,15 +37,14 @@ $DESTINO_PROJETOS = "$env:USERPROFILE\Documents\projetos"
 $ORIGEM_SKILLS    = Join-Path $OrigemDocs "skills"
 $ORIGEM_DOCS_DIR  = Join-Path $OrigemDocs "docs"
 
-# ─────────────────────────────────────────────
+# ---------------------------------------------
 #  CORES E HELPERS
-# ─────────────────────────────────────────────
+# ---------------------------------------------
 function Write-Header {
     Write-Host ""
-    Write-Host "  ╔══════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "  ║   INSTALADOR — AGENTE DE SEGURANCA                  ║" -ForegroundColor Cyan
-    Write-Host "  ║   Coordenacao de Seguranca de TI  •  v$VERSAO_PACOTE           ║" -ForegroundColor Cyan
-    Write-Host "  ╚══════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+    Write-Host "  ======================================================" -ForegroundColor Cyan
+    Write-Host "     INSTALADOR - AGENTE DE SEGURANCA  v$VERSAO_PACOTE" -ForegroundColor Cyan
+    Write-Host "  ======================================================" -ForegroundColor Cyan
     Write-Host ""
 }
 
@@ -64,9 +63,9 @@ $erros   = @()
 $avisos  = @()
 $copiados = @()
 
-# ─────────────────────────────────────────────
+# ---------------------------------------------
 #  INICIO
-# ─────────────────────────────────────────────
+# ---------------------------------------------
 Write-Header
 
 $modo_label = if ($Modo -eq "update") { "ATUALIZACAO" } else { "INSTALACAO COMPLETA" }
@@ -76,9 +75,9 @@ Write-Host "  Maquina : $env:COMPUTERNAME" -ForegroundColor White
 Write-Host "  Origem  : $OrigemDocs" -ForegroundColor White
 Write-Host ""
 
-# ─────────────────────────────────────────────
-#  PASSO 1 — VERIFICAR PRE-REQUISITOS
-# ─────────────────────────────────────────────
+# ---------------------------------------------
+#  PASSO 1 -VERIFICAR PRE-REQUISITOS
+# ---------------------------------------------
 Write-Step "1/5" "Verificando pre-requisitos..."
 
 # Node.js
@@ -128,13 +127,13 @@ if (Test-Path $ORIGEM_DOCS_DIR) {
 # Abortar se houver erros criticos
 if ($erros.Count -gt 0) {
     Write-Host ""
-    Write-Host "  INSTALACAO INTERROMPIDA — corrija os erros acima e execute novamente." -ForegroundColor Red
+    Write-Host "  INSTALACAO INTERROMPIDA -corrija os erros acima e execute novamente." -ForegroundColor Red
     exit 1
 }
 
-# ─────────────────────────────────────────────
-#  PASSO 2 — CRIAR ESTRUTURA DE PASTAS
-# ─────────────────────────────────────────────
+# ---------------------------------------------
+#  PASSO 2 -CRIAR ESTRUTURA DE PASTAS
+# ---------------------------------------------
 Write-Host ""
 Write-Step "2/5" "Criando estrutura de pastas..."
 
@@ -167,9 +166,9 @@ foreach ($pasta in $pastas) {
     }
 }
 
-# ─────────────────────────────────────────────
-#  PASSO 3 — INSTALAR SKILLS DO AGENTE
-# ─────────────────────────────────────────────
+# ---------------------------------------------
+#  PASSO 3 -INSTALAR SKILLS DO AGENTE
+# ---------------------------------------------
 Write-Host ""
 Write-Step "3/5" "Instalando skills do agente..."
 
@@ -182,14 +181,14 @@ foreach ($skill in $skills) {
         Write-OK "$acao skill: $($skill.Name)"
         $copiados += $skill.Name
     } catch {
-        Write-FAIL "Falha ao copiar skill: $($skill.Name) — $_"
+        Write-FAIL "Falha ao copiar skill: $($skill.Name) -$_"
         $erros += "Skill: $($skill.Name)"
     }
 }
 
-# ─────────────────────────────────────────────
-#  PASSO 4 — INSTALAR DOCUMENTOS DO PROCESSO
-# ─────────────────────────────────────────────
+# ---------------------------------------------
+#  PASSO 4 -INSTALAR DOCUMENTOS DO PROCESSO
+# ---------------------------------------------
 Write-Host ""
 Write-Step "4/5" "Instalando documentos do processo..."
 
@@ -202,14 +201,14 @@ foreach ($doc in $docs) {
         Write-OK "$acao doc: $($doc.Name)"
         $copiados += $doc.Name
     } catch {
-        Write-FAIL "Falha ao copiar: $($doc.Name) — $_"
+        Write-FAIL "Falha ao copiar: $($doc.Name) -$_"
         $avisos += "Doc: $($doc.Name)"
     }
 }
 
-# ─────────────────────────────────────────────
-#  PASSO 5 — VALIDACAO FINAL
-# ─────────────────────────────────────────────
+# ---------------------------------------------
+#  PASSO 5 -VALIDACAO FINAL
+# ---------------------------------------------
 Write-Host ""
 Write-Step "5/5" "Validando instalacao..."
 
@@ -232,11 +231,11 @@ foreach ($v in $validacoes) {
     }
 }
 
-# ─────────────────────────────────────────────
+# ---------------------------------------------
 #  RESUMO FINAL
-# ─────────────────────────────────────────────
+# ---------------------------------------------
 Write-Host ""
-Write-Host "  ─────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "  ---------------------------------------------------------" -ForegroundColor DarkGray
 Write-Host ""
 
 if ($erros.Count -eq 0 -and $falhas_val -eq 0) {
@@ -268,5 +267,5 @@ if ($erros.Count -eq 0 -and $falhas_val -eq 0) {
 }
 
 Write-Host ""
-Write-Host "  ─────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "  ---------------------------------------------------------" -ForegroundColor DarkGray
 Write-Host ""
