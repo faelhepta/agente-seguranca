@@ -1,79 +1,89 @@
-# Agente de Seguranca — Coordenacao de Seguranca de TI
+# Agente de Seguranca
 
-Toolkit para analise de seguranca de projetos entregues por fabricas de software.
-Automatiza as fases de analise usando o **Claude Code** e gera relatorios e apresentacoes profissionais.
+Toolkit de analise de seguranca para avaliacao de projetos de software.
+Automatiza todo o ciclo de revisao — do codigo-fonte ao relatorio executivo — usando o **Claude Code** como motor de analise, e gera apresentacoes HTML prontas para reuniao com as equipes de desenvolvimento.
 
 ---
 
-## O que este repositorio instala
+## Como funciona
 
-| Artefato | Destino na maquina |
-|----------|--------------------|
-| Skill `/relatorio-fabrica` | `%USERPROFILE%\.claude\skills\` |
-| Skill `/reanalise-fabrica` | `%USERPROFILE%\.claude\skills\` |
-| Runbook do agente | `%USERPROFILE%\Documents\Seguranca-TI\` |
-| Checklists de analise e reanalise | `%USERPROFILE%\Documents\Seguranca-TI\` |
-| Tutorial e apresentacao do time | `%USERPROFILE%\Documents\Seguranca-TI\` |
-| Script de automacao `rodar_analise.ps1` | `%USERPROFILE%\Documents\Seguranca-TI\` |
-| Template de pasta de projetos | `%USERPROFILE%\Documents\projetos\_TEMPLATE\` |
+O agente recebe os artefatos de um projeto (codigo, documentacao e infraestrutura), executa cinco fases de analise em sequencia e entrega:
+
+- **5 relatorios Markdown** com achados tecnicos detalhados
+- **2 apresentacoes HTML** para as reunioes de devolutiva com o time de desenvolvimento
+- **Parecer final** — Aprovado / Aprovado com Ressalvas / Reprovado
+
+Quando o time de desenvolvimento corrige os achados e devolve o projeto, o agente executa o ciclo de **reanalise** e verifica cada correcao individualmente.
+
+---
+
+## Fases de analise
+
+| Fase | O que analisa | Saida |
+|------|---------------|-------|
+| 1 — Codigo | OWASP Top 10, autenticacao, dependencias (CVEs), secrets, seguranca de API | `01_analise_codigo.md` |
+| 2 — Documentacao | Arquitetura, fluxo de dados, conformidade LGPD, requisitos de seguranca | `02_analise_documentacao.md` |
+| 3 — Infraestrutura | Rede, IAM, IaC (Terraform/CF), containers, monitoramento | `03_analise_infraestrutura.md` |
+| 4 — Threat Modeling | Framework STRIDE por componente critico | `04_threat_modeling.md` |
+| 5 — Relatorio Executivo | Consolidado com matriz de risco, plano de correcao e parecer | `00_RELATORIO_EXECUTIVO.md` |
+
+Apos as cinco fases, dois skills do Claude Code geram as apresentacoes:
+
+- `/relatorio-fabrica` — apresentacao de vulnerabilidades + plano de melhorias com roadmap visual
+- `/reanalise-fabrica` — verifica correcoes entregues e emite novo parecer
 
 ---
 
 ## Pre-requisitos
 
-- Node.js 18+: `node --version`
-- Claude Code: `npm install -g @anthropic-ai/claude-code`
-- Autenticacao ativa: `claude auth login`
+- **Node.js 18+** — `node --version`
+- **Claude Code** — `npm install -g @anthropic-ai/claude-code`
+- **Autenticacao** — `claude auth login`
 
 ---
 
 ## Instalacao
 
 ```powershell
-# Windows (PowerShell)
+# Windows — PowerShell
+git clone https://github.com/faelhepta/agente-seguranca.git
+cd agente-seguranca
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 .\instalar.ps1
 ```
 
 ```bash
 # Git Bash / WSL
+git clone https://github.com/faelhepta/agente-seguranca.git
+cd agente-seguranca
 bash instalar.sh
 ```
 
-Ver detalhes completos em: [GUIA_INSTALACAO.md](GUIA_INSTALACAO.md)
+O instalador copia os skills, documentos e scripts para os destinos corretos na maquina do analista e cria a estrutura de pastas para os projetos.
+
+Ver detalhes em [GUIA_INSTALACAO.md](GUIA_INSTALACAO.md).
 
 ---
 
-## Fluxo de analise
+## Uso
 
+```powershell
+# Analise completa (fases 1 a 5 + apresentacoes)
+cd "$env:USERPROFILE\Documents\Seguranca-TI"
+.\rodar_analise.ps1 -Projeto "NomeDoProjeto"
+
+# Fase especifica
+.\rodar_analise.ps1 -Projeto "NomeDoProjeto" -Fase codigo
+.\rodar_analise.ps1 -Projeto "NomeDoProjeto" -Fase infra
+
+# Simular sem executar
+.\rodar_analise.ps1 -Projeto "NomeDoProjeto" -DryRun
+
+# Reanalise apos correcoes
+.\rodar_analise.ps1 -Projeto "NomeDoProjeto" -Fase reanalise -Versao v1
 ```
-PROJETO RECEBIDO DA FABRICA
-         |
-         v
-[rodar_analise.ps1]  <- automacao completa
-         |
-         v
-relatorios/
-  01_analise_codigo.md
-  02_analise_documentacao.md
-  03_analise_infraestrutura.md
-  04_threat_modeling.md
-  00_RELATORIO_EXECUTIVO.md
-         |
-         v
-[/relatorio-fabrica]  <- skill Claude Code
-         |
-         v
-apresentacoes/
-  apresentacao_vulnerabilidades.html
-  apresentacao_melhorias_roadmap.html
-         |
-         v
-REUNIOES COM A FABRICA -> ROADMAP APROVADO
-         |
-         v
-[/reanalise-fabrica]  <- quando fabrica entregar correcoes
-```
+
+Fases disponiveis: `codigo` | `docs` | `infra` | `threat` | `relatorio` | `apresentacoes` | `reanalise` | `todas`
 
 ---
 
@@ -81,44 +91,24 @@ REUNIOES COM A FABRICA -> ROADMAP APROVADO
 
 ```
 .
-|-- instalar.ps1                  <- instalador Windows
-|-- instalar.sh                   <- instalador Linux/WSL/Git Bash
-|-- GUIA_INSTALACAO.md            <- instrucoes detalhadas
+|-- instalar.ps1              <- instalador Windows
+|-- instalar.sh               <- instalador Linux/WSL/Git Bash
+|-- GUIA_INSTALACAO.md        <- instrucoes detalhadas de instalacao
 |-- skills/
-|   |-- relatorio-fabrica.md      <- skill /relatorio-fabrica
-|   `-- reanalise-fabrica.md      <- skill /reanalise-fabrica
-|-- docs/
+|   |-- relatorio-fabrica.md  <- skill /relatorio-fabrica (apresentacoes HTML)
+|   `-- reanalise-fabrica.md  <- skill /reanalise-fabrica (verificacao de correcoes)
+|-- docs/                     <- instalados em ~/Documents/Seguranca-TI/
 |   |-- RUNBOOK_AGENTE_SEGURANCA.md
 |   |-- CHECKLIST_SEGURANCA_PROJETOS.md
 |   |-- CHECKLIST_REANALISE_PROJETOS.md
 |   |-- TUTORIAL_RODAR_ANALISE.md
 |   |-- apresentacao_time_seguranca.html
-|   |-- rodar_analise.ps1         <- script de automacao (Windows)
-|   `-- rodar_analise.sh          <- script de automacao (Linux/WSL)
+|   |-- rodar_analise.ps1     <- script de automacao (Windows)
+|   `-- rodar_analise.sh      <- script de automacao (Linux/WSL)
 `-- extras/
-    |-- analisar.ps1              <- analise interativa (pede caminho)
-    |-- analisar.sh
-    |-- gerar_apresentacoes.ps1   <- gera so as apresentacoes HTML
+    |-- analisar.ps1          <- analise interativa (solicita o caminho do projeto)
+    |-- gerar_apresentacoes.ps1 <- regenera as apresentacoes HTML de um projeto ja analisado
     `-- analisar_api.ps1
-```
-
----
-
-## Uso rapido (apos instalacao)
-
-```powershell
-# Analise completa de um projeto
-cd "$env:USERPROFILE\Documents\Seguranca-TI"
-.\rodar_analise.ps1 -Projeto "NomeDoProjeto"
-
-# Apenas uma fase especifica
-.\rodar_analise.ps1 -Projeto "NomeDoProjeto" -Fase codigo
-
-# Simular sem executar (dry run)
-.\rodar_analise.ps1 -Projeto "NomeDoProjeto" -DryRun
-
-# Reanalise apos correcoes da fabrica
-.\rodar_analise.ps1 -Projeto "NomeDoProjeto" -Fase reanalise -Versao v1
 ```
 
 ---
@@ -127,14 +117,23 @@ cd "$env:USERPROFILE\Documents\Seguranca-TI"
 
 | Documento | Descricao |
 |-----------|-----------|
-| [GUIA_INSTALACAO.md](GUIA_INSTALACAO.md) | Instalacao passo a passo |
-| [docs/RUNBOOK_AGENTE_SEGURANCA.md](docs/RUNBOOK_AGENTE_SEGURANCA.md) | Fluxo completo de analise (Passos 0-7 + Reanalise) |
-| [docs/TUTORIAL_RODAR_ANALISE.md](docs/TUTORIAL_RODAR_ANALISE.md) | Como usar o script de automacao |
-| [docs/CHECKLIST_SEGURANCA_PROJETOS.md](docs/CHECKLIST_SEGURANCA_PROJETOS.md) | Checklist de analise inicial |
-| [docs/CHECKLIST_REANALISE_PROJETOS.md](docs/CHECKLIST_REANALISE_PROJETOS.md) | Checklist de reanalise |
+| [GUIA_INSTALACAO.md](GUIA_INSTALACAO.md) | Instalacao, atualizacao e solucao de problemas |
+| [docs/RUNBOOK_AGENTE_SEGURANCA.md](docs/RUNBOOK_AGENTE_SEGURANCA.md) | Fluxo operacional completo — analise e reanalise |
+| [docs/TUTORIAL_RODAR_ANALISE.md](docs/TUTORIAL_RODAR_ANALISE.md) | Como usar o script de automacao `rodar_analise.ps1` |
+| [docs/CHECKLIST_SEGURANCA_PROJETOS.md](docs/CHECKLIST_SEGURANCA_PROJETOS.md) | Checklist da analise inicial |
+| [docs/CHECKLIST_REANALISE_PROJETOS.md](docs/CHECKLIST_REANALISE_PROJETOS.md) | Checklist de verificacao de correcoes |
 
 ---
 
-## Versao
+## Atualizando o time
+
+Quando houver atualizacao nos skills ou documentos:
+
+```powershell
+git pull
+.\instalar.ps1 -Modo update
+```
+
+---
 
 `v1.0` — Marco 2026
